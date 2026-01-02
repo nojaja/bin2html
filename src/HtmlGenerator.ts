@@ -7,15 +7,15 @@
  */
 
 export class HtmlGenerator {
-  /**
-   * ZIP+PNGデータを埋め込んだHTMLを生成する
-   * @param zipBase64 - ZIPファイルのBase64データ
-   * @param pngBase64 - サムネイル画像(PNG)のBase64データ
-   * @param filename - ファイル名
-   * @returns 生成されたHTML文字列
-   */
-  generateHtml(zipBase64: string, pngBase64: string, filename: string): string {
-    return `<!DOCTYPE html>
+    /**
+     * ZIP+PNGデータを埋め込んだHTMLを生成する
+     * @param zipBase64 - ZIPファイルのBase64データ
+     * @param pngBase64 - サムネイル画像(PNG)のBase64データ
+     * @param filename - ファイル名
+     * @returns 生成されたHTML文字列
+     */
+    generateHtml(zipBase64: string, pngBase64: string, filename: string): string {
+        return `<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -63,27 +63,27 @@ ${this.generateScript(zipBase64, pngBase64, filename)}
   </script>
 </body>
 </html>`;
-  }
+    }
 
-  /**
-   * HTMLエスケープ処理
-   */
-  private escapeHtml(text: string): string {
-    const map: Record<string, string> = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    };
-    return text.replace(/[&<>"']/g, (char) => map[char]);
-  }
+    /**
+     * HTMLエスケープ処理
+     */
+    private escapeHtml(text: string): string {
+        const map: Record<string, string> = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+        return text.replace(/[&<>"']/g, (char) => map[char]);
+    }
 
-  /**
-   * CSS生成
-   */
-  private generateCss(): string {
-    return `    * {
+    /**
+     * CSS生成
+     */
+    private generateCss(): string {
+        return `    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -165,13 +165,13 @@ ${this.generateScript(zipBase64, pngBase64, filename)}
       background: #f9f9f9;
       border-radius: 4px;
     }`;
-  }
+    }
 
-  /**
-   * JavaScript生成
-   */
-  private generateScript(zipBase64: string, pngBase64: string, filename: string): string {
-    return `    // 埋め込みデータ
+    /**
+     * JavaScript生成
+     */
+    private generateScript(zipBase64: string, pngBase64: string, filename: string): string {
+        return `    // 埋め込みデータ
     const EMBEDDED_ZIP_BASE64 = '${zipBase64}';
     const EMBEDDED_PNG_BASE64 = '${pngBase64}';
     const EMBEDDED_FILENAME = '${this.escapeJs(filename)}';
@@ -400,14 +400,33 @@ ${this.generateScript(zipBase64, pngBase64, filename)}
         const pngBase64 = await fileToBase64(pngFile);
         const filename = zipFile.name.replace(/\\.zip$/, '');
         
-        // 現在のHTMLをテンプレートとして使用
-        const currentHtml = document.documentElement.outerHTML;
+        // 新しいHTML全体を生成し、埋め込みデータを正確に置換
+        let newHtml = document.documentElement.outerHTML;
         
-        // データを置換
-        let newHtml = currentHtml;
-        newHtml = newHtml.replace(EMBEDDED_ZIP_BASE64, zipBase64);
-        newHtml = newHtml.replace(EMBEDDED_PNG_BASE64, pngBase64);
-        newHtml = newHtml.replace(new RegExp(EMBEDDED_FILENAME, 'g'), filename);
+        // スクリプトセクションのデータを置換
+        // EMBEDDED_ZIP_BASE64の古い値を新しい値に置換
+        newHtml = newHtml.replace(
+          /const EMBEDDED_ZIP_BASE64 = '[^']*'/,
+          \`const EMBEDDED_ZIP_BASE64 = '\${zipBase64}'\`
+        );
+        
+        // EMBEDDED_PNG_BASE64の古い値を新しい値に置換
+        newHtml = newHtml.replace(
+          /const EMBEDDED_PNG_BASE64 = '[^']*'/,
+          \`const EMBEDDED_PNG_BASE64 = '\${pngBase64}'\`
+        );
+        
+        // EMBEDDED_FILENAMEの古い値を新しい値に置換
+        newHtml = newHtml.replace(
+          /const EMBEDDED_FILENAME = '[^']*'/,
+          \`const EMBEDDED_FILENAME = '\${filename.replace(/'/g, "\\\\'")}'\`
+        );
+        
+        // 同時にイメージセクションのPNG表示部分も更新
+        newHtml = newHtml.replace(
+          /src="data:image\\/png;base64,[^"]*"/,
+          \`src="data:image/png;base64,\${pngBase64}"\`
+        );
         
         // HTMLファイルとしてダウンロード
         const blob = new Blob([newHtml], { type: 'text/html' });
@@ -419,6 +438,8 @@ ${this.generateScript(zipBase64, pngBase64, filename)}
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        
+        alert('新しいHTMLを生成しました！');
       } catch (error) {
         alert('HTML生成エラー: ' + error.message);
       }
@@ -436,16 +457,16 @@ ${this.generateScript(zipBase64, pngBase64, filename)}
         reader.readAsDataURL(file);
       });
     }`;
-  }
+    }
 
-  /**
-   * JavaScriptエスケープ処理
-   */
-  private escapeJs(text: string): string {
-    return text.replace(/\\/g, '\\\\')
-               .replace(/'/g, "\\'")
-               .replace(/"/g, '\\"')
-               .replace(/\n/g, '\\n')
-               .replace(/\r/g, '\\r');
-  }
+    /**
+     * JavaScriptエスケープ処理
+     */
+    private escapeJs(text: string): string {
+        return text.replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r');
+    }
 }
