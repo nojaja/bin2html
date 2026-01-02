@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binary to HTML Generator</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Binary to HTML Generator</h1>
+    <p class="description">
+      このツールは、ZIPファイルとサムネイル画像(PNG)を埋め込んだ
+      単独のHTMLファイルを生成します。
+    </p>
+
+    <section class="generate-section">
+      <h2>HTMLファイルを生成</h2>
+      <div class="upload-area">
+        <div class="form-group">
+          <label for="zipFile">
+            <span class="label-text">ZIPファイル:</span>
+            <span class="required">*</span>
+          </label>
+          <input type="file" id="zipFile" accept=".zip" required>
+        </div>
+        <div class="form-group">
+          <label for="pngFile">
+            <span class="label-text">PNGファイル (サムネイル):</span>
+            <span class="required">*</span>
+          </label>
+          <input type="file" id="pngFile" accept=".png" required>
+        </div>
+        <div class="form-group">
+          <label for="filename">
+            <span class="label-text">ファイル名:</span>
+            <span class="required">*</span>
+          </label>
+          <input type="text" id="filename" placeholder="例: my-project" required>
+          <small>生成されるHTMLファイル名: [入力値].html</small>
+        </div>
+        <button id="generateBtn" class="primary-btn">HTMLを生成してダウンロード</button>
+      </div>
+    </section>
+
+    <section class="info-section">
+      <h2>生成されるHTMLについて</h2>
+      <ul>
+        <li>生成されたHTMLは単独で動作し、ZIPとPNGデータを内包します</li>
+        <li>HTMLから直接ZIPファイルをダウンロードできます</li>
+        <li>HTMLからZIP埋め込み済みPNGをダウンロードできます</li>
+        <li>生成されたHTML自体を複製・配布可能です</li>
+      </ul>
+    </section>
+  </div>
+
+  <div id="loading" class="loading hidden">
+    <div class="spinner"></div>
+    <p>処理中...</p>
+  </div>
+</body>
+</html>
